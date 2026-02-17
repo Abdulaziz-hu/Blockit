@@ -9,8 +9,8 @@ A minimal, open-source Chrome extension to block distracting websites.
 - **Per-site toggle**: enable/disable individual sites without deleting them  
 - **Global pause**: temporarily disable all blocking with one switch  
 - **Instant redirect**: blocked sites redirect to a clean blocked page  
-- **Remove from blocked page**: unblock a site directly from the blocked screen  
-- **Fully local**: all data stored in `chrome.storage.local`, nothing leaves your device  
+- **Remove from blocked page**: unblock a site directly from the blocked screen
+- **Fully local**: all data stored in `chrome.storage.local`, nothing leaves your device
 
 ## Screenshots
 
@@ -29,9 +29,10 @@ A minimal, open-source Chrome extension to block distracting websites.
 
     - Clone this repository via your terminal:
         ```bash
+        git clone https://github.com/Abdulaziz-hu/Blockit.git
         ```
 
-    - *Or* download the latest source code ZIP from the [Releases page]() and unzip it.
+    - *Or* download the latest source code ZIP from the [Releases page](https://github.com/Abdulaziz-hu/Blockit/releases/latest) and unzip it.
 
 2. **Open Extensions:**
 
