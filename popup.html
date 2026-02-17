@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlockIt</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── DARK THEME (default) ── */
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #1a1a1a;
+      --border: #222222;
+      --border-hover: #333333;
+      --text: #e8e8e8;
+      --text-muted: #555;
+      --text-dim: #888;
+      --accent: #e8ff00;
+      --accent-dim: rgba(232, 255, 0, 0.12);
+      --accent-border: rgba(232, 255, 0, 0.3);
+      --red: #ff4040;
+      --red-dim: rgba(255, 64, 64, 0.1);
+      --green: #00e676;
+      --green-dim: rgba(0, 230, 118, 0.1);
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    /* ── LIGHT THEME ── */
+    [data-theme="light"] {
+      --bg: #f5f5f0;
+      --surface: #ebebE6;
+      --surface2: #e0e0da;
+      --border: #d0d0ca;
+      --border-hover: #b8b8b2;
+      --text: #111111;
+      --text-muted: #999;
+      --text-dim: #666;
+      --accent: #7a8800;
+      --accent-dim: rgba(122, 136, 0, 0.1);
+      --accent-border: rgba(122, 136, 0, 0.3);
+      --red: #cc2222;
+      --red-dim: rgba(204, 34, 34, 0.08);
+      --green: #007a3d;
+      --green-dim: rgba(0, 122, 61, 0.08);
+    }
+
+    html {
+      width: 360px;
+      background: var(--bg);
+      transition: background 0.2s ease;
+    }
+
+    body {
+      width: 360px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      overflow-x: hidden;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 13px;
+      height: 13px;
+    }
+
+    .logo-name {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .logo-name span {
+      color: var(--accent);
+    }
+
+    /* Header right cluster */
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── THEME TOGGLE BUTTON ── */
+    .theme-btn {
+      width: 26px;
+      height: 26px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .theme-btn:active {
+      transform: scale(0.94);
+    }
+
+    /* Sun icon — shown in dark mode (click to go light) */
+    .icon-sun  { display: flex; }
+    .icon-moon { display: none; }
+
+    [data-theme="light"] .icon-sun  { display: none; }
+    [data-theme="light"] .icon-moon { display: flex; }
+
+    /* ── GLOBAL TOGGLE ── */
+    .global-toggle {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+    }
+
+    .global-toggle-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .global-toggle.active .global-toggle-label {
+      color: var(--accent);
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 32px;
+      height: 18px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: all 0.2s ease;
+    }
+
+    .toggle-switch input:checked + .toggle-track {
+      background: var(--accent-dim);
+      border-color: var(--accent-border);
+    }
+
+    .toggle-switch input:checked + .toggle-track::after {
+      background: var(--accent);
+      transform: translateX(14px);
+    }
+
+    /* ── BLOCK CURRENT TAB BUTTON ── */
+    .block-current {
+      margin: 12px 16px;
+    }
+
+    #blockCurrentBtn {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+    }
+
+    #blockCurrentBtn:hover {
+      border-color: var(--accent-border);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    #blockCurrentBtn:hover .btn-icon {
+      color: var(--accent);
+    }
+
+    #blockCurrentBtn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      color: var(--text-muted);
+      transition: color 0.15s ease;
+      display: flex;
+    }
+
+    .current-domain {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      letter-spacing: 0em;
+      text-transform: none;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* ── ADD URL FORM ── */
+    .add-section {
+      padding: 0 16px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .input-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    #urlInput {
+      flex: 1;
+      padding: 9px 11px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    #urlInput::placeholder {
+      color: var(--text-muted);
+    }
+
+    #urlInput:focus {
+      border-color: var(--accent-border);
+    }
+
+    #addBtn {
+      padding: 9px 13px;
+      background: var(--accent);
+      border: none;
+      border-radius: 4px;
+      color: #0a0a0a;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    [data-theme="light"] #addBtn {
+      color: #ffffff;
+    }
+
+    #addBtn:hover {
+      opacity: 0.88;
+    }
+
+    #addBtn:active {
+      transform: scale(0.97);
+    }
+
+    /* Messages */
+    .msg {
+      margin-top: 7px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.03em;
+      height: 14px;
+      transition: opacity 0.2s;
+    }
+
+    .msg.error   { color: var(--red); }
+    .msg.success { color: var(--green); }
+    .msg.hidden  { opacity: 0; }
+
+    /* ── LIST ── */
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px 8px;
+    }
+
+    .list-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .list-count {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1px 7px;
+    }
+
+    .sites-list {
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 0 8px 8px;
+    }
+
+    .sites-list::-webkit-scrollbar { width: 4px; }
+    .sites-list::-webkit-scrollbar-track { background: transparent; }
+    .sites-list::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .site-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 8px;
+      border-radius: 4px;
+      transition: background 0.1s ease;
+      border: 1px solid transparent;
+      animation: fadeIn 0.15s ease both;
+    }
+
+    .site-item:hover {
+      background: var(--surface);
+      border-color: var(--border);
+    }
+
+    .site-item.disabled {
+      opacity: 0.45;
+    }
+
+    .site-favicon {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .site-favicon img {
+      width: 14px;
+      height: 14px;
+      border-radius: 2px;
+    }
+
+    .site-favicon-placeholder {
+      width: 14px;
+      height: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 7px;
+      font-weight: 600;
+    }
+
+    .site-domain {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .site-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .site-toggle {
+      position: relative;
+      width: 26px;
+      height: 14px;
+    }
+
+    .site-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .site-toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .site-toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      top: 1.5px;
+      left: 1.5px;
+      transition: all 0.2s ease;
+    }
+
+    .site-toggle input:checked + .site-toggle-track {
+      background: var(--green-dim);
+      border-color: rgba(0, 230, 118, 0.3);
+    }
+
+    .site-toggle input:checked + .site-toggle-track::after {
+      background: var(--green);
+      transform: translateX(12px);
+    }
+
+    [data-theme="light"] .site-toggle input:checked + .site-toggle-track {
+      border-color: rgba(0, 122, 61, 0.3);
+    }
+
+    .delete-btn {
+      width: 24px;
+      height: 24px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+
+    .delete-btn:hover {
+      background: var(--red-dim);
+      border-color: rgba(255, 64, 64, 0.2);
+      color: var(--red);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      line-height: 1.6;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 9px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-mit {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .footer-mit span {
+      color: var(--accent);
+    }
+
+    .clear-all-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 3px 6px;
+      border-radius: 3px;
+      transition: all 0.15s ease;
+    }
+
+    .clear-all-btn:hover {
+      color: var(--red);
+      background: var(--red-dim);
+    }
+
+    /* Paused banner */
+    .paused-banner {
+      background: rgba(255, 64, 64, 0.07);
+      border-bottom: 1px solid rgba(255, 64, 64, 0.15);
+      padding: 7px 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.05em;
+      color: var(--red);
+      text-align: center;
+      display: none;
+    }
+
+    .paused-banner.visible {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="11" height="11" rx="1.5" stroke="#0a0a0a" stroke-width="1.5"/>
+          <line x1="3" y1="5" x2="10" y2="5" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="3" y1="8" x2="7.5" y2="8" stroke="#0a0a0a" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="logo-name">Block<span>It</span></span>
+    </div>
+
+    <div class="header-right">
+      <!-- Theme toggle -->
+      <button class="theme-btn" id="themeBtn" title="Toggle light / dark theme">
+        <!-- Sun (shown in dark mode → click to go light) -->
+        <span class="icon-sun">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="6" r="2.3" stroke="currentColor" stroke-width="1.2"/>
+            <line x1="6" y1="0.5" x2="6" y2="1.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="6" y1="10.3" x2="6" y2="11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="0.5" y1="6" x2="1.7" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="10.3" y1="6" x2="11.5" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="1.93" y1="1.93" x2="2.78" y2="2.78" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9.22" y1="9.22" x2="10.07" y2="10.07" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="10.07" y1="1.93" x2="9.22" y2="2.78" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="2.78" y1="9.22" x2="1.93" y2="10.07" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <!-- Moon (shown in light mode → click to go dark) -->
+        <span class="icon-moon">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M9.5 7A5 5 0 0 1 5 1.5a5.5 5.5 0 1 0 4.5 5.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Global blocking toggle -->
+      <label class="global-toggle" id="globalToggleLabel" title="Enable or disable all blocking">
+        <span class="global-toggle-label" id="globalToggleText">ON</span>
+        <div class="toggle-switch">
+          <input type="checkbox" id="globalToggle" checked />
+          <div class="toggle-track"></div>
+        </div>
+      </label>
+    </div>
+  </div>
+
+  <!-- PAUSED BANNER -->
+  <div class="paused-banner" id="pausedBanner">
+    ⚠ blocking is paused — all sites are accessible
+  </div>
+
+  <!-- BLOCK CURRENT TAB -->
+  <div class="block-current">
+    <button id="blockCurrentBtn">
+      <div class="btn-left">
+        <span class="btn-icon">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.3"/>
+            <line x1="2" y1="2" x2="11" y2="11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+        </span>
+        Block this site
+      </div>
+      <span class="current-domain" id="currentDomain">—</span>
+    </button>
+  </div>
+
+  <!-- ADD URL FORM -->
+  <div class="add-section">
+    <div class="input-row">
+      <input
+        type="text"
+        id="urlInput"
+        placeholder="e.g. reddit.com or https://reddit.com"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="addBtn">Block</button>
+    </div>
+    <div class="msg hidden" id="msg"></div>
+  </div>
+
+  <!-- BLOCKED SITES LIST -->
+  <div class="list-header">
+    <span class="list-title">Blocked Sites</span>
+    <span class="list-count" id="listCount">0</span>
+  </div>
+
+  <div class="sites-list" id="sitesList"></div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="footer-mit"><span>MIT</span> — Free & Open Source</span>
+    <button class="clear-all-btn" id="clearAllBtn">Clear all</button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blocked — BlockIt</title>
+  <link rel="stylesheet" href="./static/css/blocked.css" />
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+  <div class="corner-tl"></div>
+  <div class="corner-br"></div>
+
+  <!-- Theme toggle -->
+  <button class="theme-btn" id="themeBtn" title="Toggle theme">
+    <!-- Sun icon: shown in dark mode → click to switch to light -->
+    <span class="icon-sun">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <circle cx="6" cy="6" r="2.3" stroke="currentColor" stroke-width="1.2"/>
+        <line x1="6" y1="0.5" x2="6" y2="1.7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="6" y1="10.3" x2="6" y2="11.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="0.5" y1="6" x2="1.7" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="10.3" y1="6" x2="11.5" y2="6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="1.93" y1="1.93" x2="2.78" y2="2.78" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="9.22" y1="9.22" x2="10.07" y2="10.07" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="10.07" y1="1.93" x2="9.22" y2="2.78" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="2.78" y1="9.22" x2="1.93" y2="10.07" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <!-- Moon icon: shown in light mode → click to switch to dark -->
+    <span class="icon-moon">
+      <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+        <path d="M9.5 7A5 5 0 0 1 5 1.5a5.5 5.5 0 1 0 4.5 5.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+    <span id="themeLabel">Light</span>
+  </button>
+
+  <div class="container">
+    <div class="top-label">
+      <span class="top-label-dot"></span>
+      BlockIt — Access Denied
+    </div>
+
+    <div class="block-icon-wrap">
+      <div class="block-icon-ring"></div>
+      <div class="block-icon">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <circle cx="17" cy="17" r="13" stroke="#e8ff00" stroke-width="1.2" stroke-dasharray="3 4" opacity="0.5"/>
+          <circle cx="17" cy="17" r="9"  stroke="#e8ff00" stroke-width="1"   opacity="0.2"/>
+          <line x1="7" y1="7" x2="27" y2="27" stroke="#ff4040" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="17" cy="17" r="5" stroke="#ff4040" stroke-width="1.2" opacity="0.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="heading">Site Blocked</div>
+    <div class="site-name" id="siteName">—</div>
+
+    <div class="divider"></div>
+
+    <div class="subtitle" id="motivationalText">
+      Stay focused. You blocked this site for a reason.
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-item">
+        <div class="stat-value" id="blockCount">—</div>
+        <div class="stat-label">Times Blocked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="totalBlocked">—</div>
+        <div class="stat-label">Sites Blocked</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="daysActive">—</div>
+        <div class="stat-label">Days Active</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-unblock" id="unblockBtn">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <line x1="1" y1="1" x2="9" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="9" y1="1" x2="1" y2="9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Remove Block
+      </button>
+    </div>
+
+    <div class="success-msg" id="successMsg">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+        <path d="M1.5 5.5L4.5 8.5L9.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Unblocked — redirecting…
+    </div>
+
+    <div class="footer">
+      <span class="footer-text">BlockIt</span>
+      <div class="footer-sep"></div>
+      <span class="footer-text">MIT License</span>
+      <div class="footer-sep"></div>
+      <span class="footer-text"><a href="https://github.com/Abdulaziz-hu/Blockit" target="_blank">Free & Open Source</a></span>
+    </div>
+  </div>
+
+  <script src="./static/js/blocked.js"></script>
+</body>
+</html>
