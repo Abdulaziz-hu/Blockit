@@ -25,6 +25,8 @@
   --green-dim: rgba(0, 230, 118, 0.1);
   --blue: #2196f3;
   --blue-dim: rgba(33, 150, 243, 0.1);
+  --link:         #f6ff00;
+  --link-hover:   #8f931a;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'IBM Plex Sans', sans-serif;
 }
@@ -48,6 +50,8 @@
   --green-dim: rgba(0, 122, 61, 0.08);
   --blue: #1976d2;
   --blue-dim: rgba(25, 118, 210, 0.1);
+  --link:         #f6ff00;
+  --link-hover:   #8f931a;
 }
 
 html {
@@ -64,6 +68,15 @@ body {
   font-size: 13px;
   overflow-x: hidden;
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+}
+
+a:hover {
+  color: var(--link-hover);
 }
 
 /* ── UPDATE BANNER ── */
