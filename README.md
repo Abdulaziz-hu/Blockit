@@ -17,6 +17,8 @@ A minimal, open-source Chrome extension to block distracting websites.
 <div align="center">
   <img src="./screenshots/popup-dark.png" alt="Extension Popup Interface - Dark" width="49%" />
   <img src="./screenshots/popup-light.png" alt="Extension Popup Interface - Light" width="49%" />
+  <img src="./screenshots/settings-dark.png" alt="Extension Settings Interface - Dark" width="49%" />
+  <img src="./screenshots/settings-light.png" alt="Extension Settings Interface - Light" width="49%" />
   <img src="./screenshots/blocked-page-dark.png" alt="Blocked Website Screen - Dark" width="100%" />
   <img src="./screenshots/blocked-page-light.png" alt="Blocked Website Screen - Light" width="100%" />
 </div>
