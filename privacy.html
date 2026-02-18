@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — BlockIt</title>
+  <link rel="stylesheet" href="./static/css/privacy.css">
+</head>
+<body>
+
+  <div class="header">
+    <h1>Privacy Policy</h1>
+    <p style="color: var(--text-dim); font-size: 14px; margin-top: 10px;">BlockIt Chrome Extension</p>
+  </div>
+
+  <div class="last-updated">
+    <strong>Last Updated:</strong> February 18, 2026
+  </div>
+
+  <div class="intro">
+    <p>
+      BlockIt ("we", "our", or "the extension") is committed to protecting your privacy. 
+      This Privacy Policy explains how BlockIt handles your data.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">1. Data Collection</h2>
+    <div class="section-content">
+      <p><strong>BlockIt does NOT collect, transmit, or share any personal data.</strong></p>
+      <p>All data is stored locally on your device using Chrome's storage API. This includes:</p>
+      <ul>
+        <li><strong>Blocked Sites List:</strong> Domain names you've chosen to block</li>
+        <li><strong>Extension Settings:</strong> Your preferences (theme, global toggle state)</li>
+        <li><strong>Usage Statistics:</strong> Local counters (number of times blocked, install date)</li>
+        <li><strong>Break Times:</strong> Temporary timestamps for break time features</li>
+      </ul>
+      <p><strong>None of this data leaves your device.</strong></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">2. Data Storage</h2>
+    <div class="section-content">
+      <p>All data is stored using:</p>
+      <ul>
+        <li><strong>chrome.storage.local</strong> - Persistent local storage on your device</li>
+        <li><strong>chrome.storage.session</strong> - Temporary session storage (cleared when browser closes)</li>
+      </ul>
+      <p>This data is:</p>
+      <ul>
+        <li>✅ Stored only on your local device</li>
+        <li>✅ Never transmitted to any server</li>
+        <li>✅ Never shared with third parties</li>
+        <li>✅ Not synced across devices</li>
+        <li>✅ Completely under your control</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">3. Network Requests</h2>
+    <div class="section-content">
+      <p>BlockIt makes <strong>one optional network request</strong>:</p>
+      <ul>
+        <li>
+          <strong>Update Checker:</strong> Checks GitHub's public API for new releases
+          <br>
+          <span style="font-size: 13px; color: var(--text-muted);">URL: <code>https://api.github.com/repos/Abdulaziz-hu/blockit/releases/latest</code></span>
+          <br>
+          <span style="font-size: 13px; color: var(--text-muted);">Frequency: On install and once per day</span>
+          <br>
+          <span style="font-size: 13px; color: var(--text-muted);">Data Sent: None - This is a public API call with no identifiable information</span>
+        </li>
+      </ul>
+      <p><strong>No tracking, analytics, or telemetry of any kind.</strong></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">4. Permissions Explained</h2>
+    <div class="section-content">
+      <p>BlockIt requires the following Chrome permissions:</p>
+      
+      <div class="permission-item">
+        <div class="permission-name">declarativeNetRequest</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To redirect blocked sites to the blocked page
+          <br>
+          <strong>Usage:</strong> Creates blocking rules that run locally in your browser
+        </div>
+      </div>
+
+      <div class="permission-item">
+        <div class="permission-name">storage</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To save your blocked sites list and preferences
+          <br>
+          <strong>Usage:</strong> Stores data locally on your device only
+        </div>
+      </div>
+
+      <div class="permission-item">
+        <div class="permission-name">tabs</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To block the current tab and redirect after unblocking
+          <br>
+          <strong>Usage:</strong> Reads current tab URL when you click "Block this site"
+        </div>
+      </div>
+
+      <div class="permission-item">
+        <div class="permission-name">activeTab</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To interact with the currently active tab
+          <br>
+          <strong>Usage:</strong> Allows quick-blocking of the current page
+        </div>
+      </div>
+
+      <div class="permission-item">
+        <div class="permission-name">webNavigation</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To detect when you navigate to a blocked site
+          <br>
+          <strong>Usage:</strong> Monitors navigation to apply blocking rules
+        </div>
+      </div>
+
+      <div class="permission-item">
+        <div class="permission-name">host: &lt;all_urls&gt;</div>
+        <div class="permission-desc">
+          <strong>Why:</strong> To block any website you choose
+          <br>
+          <strong>Usage:</strong> Allows blocking rules to work on all domains
+        </div>
+      </div>
+
+      <p class="permission-note">
+        <strong>Important:</strong> These permissions are used exclusively for blocking functionality. 
+        BlockIt does not read page content, access passwords, or collect browsing history.
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">5. Third-Party Services</h2>
+    <div class="section-content">
+      <p><strong>BlockIt does not use any third-party services, analytics, or tracking tools.</strong></p>
+      <p>The only external interaction is the optional update check to GitHub's public API (see section 3).</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">6. Data Deletion</h2>
+    <div class="section-content">
+      <p>You have complete control over your data:</p>
+      <ul>
+        <li><strong>Delete individual sites:</strong> Click the ✕ button next to any site</li>
+        <li><strong>Clear all data:</strong> Settings → "Clear All Data" button</li>
+        <li><strong>Uninstall extension:</strong> Removes all stored data automatically</li>
+      </ul>
+      <p>Since all data is stored locally, deleting the extension or clearing its data permanently removes everything.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">7. Children's Privacy</h2>
+    <div class="section-content">
+      <p>
+        BlockIt does not collect any data from anyone, including children under 13. 
+        The extension can be safely used by people of all ages.
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">8. Changes to This Policy</h2>
+    <div class="section-content">
+      <p>
+        If we make changes to this Privacy Policy, we will update the "Last Updated" date at the top. 
+        Continued use of BlockIt after changes constitutes acceptance of the updated policy.
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">9. Open Source</h2>
+    <div class="section-content">
+      <p>
+        BlockIt is open source. You can review the entire codebase to verify these privacy claims:
+      </p>
+      <p class="github-link">
+        <a href="https://github.com/Abdulaziz-hu/blockit" target="_blank">
+          View Source Code on GitHub →
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">10. Contact</h2>
+    <div class="section-content">
+      <p>Questions about this Privacy Policy? Contact us:</p>
+      <ul>
+        <li>
+          <strong>GitHub Issues:</strong> 
+          <a href="https://github.com/Abdulaziz-hu/blockit/issues" target="_blank">
+            Report an Issue
+          </a>
+        </li>
+        <li>
+          <strong>Email:</strong> aziz.f.alhuzami@gmail.com
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="summary-box">
+    <h3>Summary</h3>
+    <p>
+      <strong>TL;DR:</strong> BlockIt collects zero data. Everything stays on your device. 
+      No tracking, no analytics, no servers, no cloud. Open source and transparent.
+    </p>
+  </div>
+
+  <div class="footer">
+    <p>© 2026 BlockIt. MIT License. Free & Open Source.</p>
+  </div>
+
+</body>
+</html>
