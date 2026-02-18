@@ -2,8 +2,8 @@
 // MIT License - Open Source
 
 const RULE_ID_OFFSET = 1000;
-const GITHUB_API_URL = 'https://api.github.com/repos/YOUR_GITHUB_USERNAME/blockit/releases/latest';
-const CURRENT_VERSION = '1.2.0';
+const GITHUB_API_URL = 'https://api.github.com/repos/Abdulaziz-hu/blockit/releases/latest';
+const CURRENT_VERSION = '1.3.0';
 
 // ── INSTALL / STARTUP ────────────────────────────────────────────────────────
 
