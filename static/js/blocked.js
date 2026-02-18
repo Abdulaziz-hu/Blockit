@@ -2,8 +2,6 @@
 // MIT License - Open Source
 
 // ── THEME ─────────────────────────────────────────────────────────────────────
-// Apply theme immediately from storage to avoid any flash.
-// We use the callback form (not async/await) so it fires as fast as possible.
 
 const htmlEl = document.documentElement;
 
@@ -23,15 +21,10 @@ document.getElementById('themeBtn').addEventListener('click', () => {
   const next = current === 'dark' ? 'light' : 'dark';
   htmlEl.setAttribute('data-theme', next);
   updateThemeButton(next);
-  // Persist so popup + future blocked pages stay in sync
   chrome.storage.local.set({ theme: next });
 });
 
 // ── DOMAIN RESOLUTION ─────────────────────────────────────────────────────────
-// Strategy 1: ask background for the session-stored domain for this tab.
-// Strategy 2: fall back to the ?site= query param in the URL.
-// Strategy 3: fall back to document.referrer hostname.
-// This triple-fallback means the site name is always shown correctly.
 
 function getDomainFromUrl() {
   const params = new URLSearchParams(window.location.search);
@@ -49,10 +42,8 @@ function getDomainFromReferrer() {
   return null;
 }
 
-// Kick off domain resolution immediately
 const urlFallback = getDomainFromUrl() || getDomainFromReferrer();
 
-// Ask background (most reliable)
 chrome.runtime.sendMessage(
   { action: 'getBlockedDomain', fallback: urlFallback },
   (response) => {
@@ -61,14 +52,12 @@ chrome.runtime.sendMessage(
     if (!chrome.runtime.lastError && response && response.success && response.domain) {
       domain = response.domain;
     } else {
-      // Background couldn't help — use URL/referrer fallback
       domain = urlFallback;
     }
 
     if (domain) {
       initPage(domain);
     } else {
-      // Absolute last resort: show a generic message
       initPage(null);
     }
   }
@@ -79,7 +68,6 @@ chrome.runtime.sendMessage(
 function initPage(domain) {
   const displayDomain = domain || 'this site';
 
-  // Update page title and site name element
   document.getElementById('siteName').textContent = displayDomain;
   document.title = domain ? `Blocked: ${domain} — BlockIt` : 'Blocked — BlockIt';
 
@@ -117,17 +105,17 @@ function initPage(domain) {
   document.getElementById('motivationalText').textContent =
     quotes[Math.floor(Math.random() * quotes.length)];
 
-  // Load stats (only if we know the domain)
   if (domain) {
     loadStats(domain);
     setupUnblock(domain);
+    setupBreakTime(domain);
   } else {
-    // Hide stats bar if no domain known
     const statsBar = document.getElementById('statsBar');
     if (statsBar) statsBar.style.display = 'none';
-    // Disable unblock button
     const btn = document.getElementById('unblockBtn');
     if (btn) { btn.disabled = true; btn.style.opacity = '0.4'; }
+    const breakSection = document.getElementById('breakTimeSection');
+    if (breakSection) breakSection.style.display = 'none';
   }
 }
 
@@ -157,12 +145,12 @@ function setupUnblock(domain) {
 
   btn.addEventListener('click', () => {
     btn.disabled = true;
+    successMsg.textContent = 'Unblocked — redirecting…';
     successMsg.classList.add('visible');
 
     chrome.runtime.sendMessage({ action: 'unblockSite', domain }, (response) => {
       if (chrome.runtime.lastError) {
         console.warn('BlockIt: unblockSite error', chrome.runtime.lastError.message);
-        // Hard fallback: navigate directly after a delay
         setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
         return;
       }
@@ -170,7 +158,39 @@ function setupUnblock(domain) {
         console.warn('BlockIt: unblockSite returned failure', response);
         setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
       }
-      // Background handles tab navigation after clearing rules
+    });
+  });
+}
+
+// ── BREAK TIME ───────────────────────────────────────────────────────────────
+
+function setupBreakTime(domain) {
+  const breakButtons = document.querySelectorAll('.btn-break');
+  const successMsg   = document.getElementById('successMsg');
+  const unblockBtn   = document.getElementById('unblockBtn');
+  
+  breakButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const minutes = parseInt(btn.dataset.minutes, 10);
+      
+      // Disable all buttons
+      breakButtons.forEach(b => b.disabled = true);
+      unblockBtn.disabled = true;
+      
+      successMsg.textContent = `${minutes} min break granted — redirecting…`;
+      successMsg.classList.add('visible');
+      
+      chrome.runtime.sendMessage({ action: 'setBreakTime', domain, minutes }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn('BlockIt: setBreakTime error', chrome.runtime.lastError.message);
+          setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
+          return;
+        }
+        if (!response || !response.success) {
+          console.warn('BlockIt: setBreakTime returned failure', response);
+          setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
+        }
+      });
     });
   });
 }

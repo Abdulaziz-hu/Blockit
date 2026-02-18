@@ -14,6 +14,15 @@ const currentDomainEl   = document.getElementById('currentDomain');
 const clearAllBtn       = document.getElementById('clearAllBtn');
 const msgEl             = document.getElementById('msg');
 const themeBtn          = document.getElementById('themeBtn');
+const searchInput       = document.getElementById('searchInput');
+const searchClear       = document.getElementById('searchClear');
+const updateBanner      = document.getElementById('updateBanner');
+const updateLink        = document.getElementById('updateLink');
+const updateVersion     = document.getElementById('updateVersion');
+const updateClose       = document.getElementById('updateClose');
+
+let allSites = [];
+let searchQuery = '';
 
 // ── THEME ──────────────────────────────────────────────────────────────────
 
@@ -21,7 +30,6 @@ function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
 }
 
-// Load saved theme on open — default is dark
 chrome.storage.local.get(['theme'], (data) => {
   applyTheme((data && data.theme) ? data.theme : 'dark');
 });
@@ -32,6 +40,86 @@ themeBtn.addEventListener('click', () => {
   applyTheme(next);
   chrome.storage.local.set({ theme: next });
 });
+
+// ── UPDATE CHECKER ─────────────────────────────────────────────────────────
+
+function checkForUpdates() {
+  chrome.runtime.sendMessage({ action: 'getUpdateInfo' }, (response) => {
+    if (chrome.runtime.lastError || !response) return;
+    
+    if (response.updateAvailable) {
+      updateVersion.textContent = `v${response.latestVersion} is ready`;
+      updateLink.href = response.releaseUrl || '#';
+      updateBanner.classList.add('visible');
+    }
+  });
+}
+
+updateClose.addEventListener('click', () => {
+  updateBanner.classList.remove('visible');
+  chrome.storage.local.set({ updateDismissed: true });
+});
+
+// Check on open if banner wasn't dismissed
+chrome.storage.local.get(['updateDismissed'], (data) => {
+  if (!data.updateDismissed) {
+    checkForUpdates();
+  }
+});
+
+// ── SEARCH ─────────────────────────────────────────────────────────────────
+
+searchInput.addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  
+  if (searchQuery) {
+    searchClear.style.display = 'block';
+  } else {
+    searchClear.style.display = 'none';
+  }
+  
+  filterSites();
+});
+
+searchClear.addEventListener('click', () => {
+  searchInput.value = '';
+  searchQuery = '';
+  searchClear.style.display = 'none';
+  filterSites();
+});
+
+function filterSites() {
+  const items = document.querySelectorAll('.site-item');
+  let visibleCount = 0;
+  
+  items.forEach(item => {
+    const domain = item.querySelector('.site-domain').textContent.toLowerCase();
+    const matches = !searchQuery || domain.includes(searchQuery);
+    
+    if (matches) {
+      item.classList.remove('hidden');
+      visibleCount++;
+    } else {
+      item.classList.add('hidden');
+    }
+  });
+  
+  // Show "no results" message if searching and nothing matches
+  const noResults = document.querySelector('.no-results');
+  if (searchQuery && visibleCount === 0 && allSites.length > 0) {
+    if (!noResults) {
+      const div = document.createElement('div');
+      div.className = 'no-results';
+      div.innerHTML = `
+        <div class="no-results-icon">🔍</div>
+        <div class="no-results-text">No sites match "${searchQuery}"</div>
+      `;
+      sitesList.appendChild(div);
+    }
+  } else if (noResults) {
+    noResults.remove();
+  }
+}
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
 
@@ -89,6 +177,8 @@ async function setGlobalEnabled(val) {
 async function render() {
   const [sites, globalEnabled] = await Promise.all([getSites(), getGlobalEnabled()]);
 
+  allSites = sites;
+  
   globalToggle.checked = globalEnabled;
   globalToggleText.textContent = globalEnabled ? 'ON' : 'OFF';
   globalToggleLabel.classList.toggle('active', globalEnabled);
@@ -138,6 +228,11 @@ async function render() {
 
     sitesList.appendChild(item);
   });
+  
+  // Reapply search filter after render
+  if (searchQuery) {
+    filterSites();
+  }
 }
 
 // ── EVENT HANDLERS ────────────────────────────────────────────────────────

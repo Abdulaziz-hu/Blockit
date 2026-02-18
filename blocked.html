@@ -15,7 +15,6 @@
 
   <!-- Theme toggle -->
   <button class="theme-btn" id="themeBtn" title="Toggle theme">
-    <!-- Sun icon: shown in dark mode → click to switch to light -->
     <span class="icon-sun">
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
         <circle cx="6" cy="6" r="2.3" stroke="currentColor" stroke-width="1.2"/>
@@ -29,7 +28,6 @@
         <line x1="2.78" y1="9.22" x2="1.93" y2="10.07" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
       </svg>
     </span>
-    <!-- Moon icon: shown in light mode → click to switch to dark -->
     <span class="icon-moon">
       <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
         <path d="M9.5 7A5 5 0 0 1 5 1.5a5.5 5.5 0 1 0 4.5 5.5z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -88,13 +86,25 @@
         </svg>
         Remove Block
       </button>
+      
+      <!-- Break Time Section -->
+      <div class="break-time-section" id="breakTimeSection">
+        <div class="break-time-label">Or take a short break</div>
+        <div class="break-time-buttons">
+          <button class="btn-break" data-minutes="5">5 min</button>
+          <button class="btn-break" data-minutes="10">10 min</button>
+          <button class="btn-break" data-minutes="15">15 min</button>
+          <button class="btn-break" data-minutes="20">20 min</button>
+          <button class="btn-break" data-minutes="30">30 min</button>
+        </div>
+      </div>
     </div>
 
     <div class="success-msg" id="successMsg">
       <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
         <path d="M1.5 5.5L4.5 8.5L9.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Unblocked — redirecting…
+      <span>Unblocked — redirecting…</span>
     </div>
 
     <div class="footer">
@@ -102,7 +112,7 @@
       <div class="footer-sep"></div>
       <span class="footer-text">MIT License</span>
       <div class="footer-sep"></div>
-      <span class="footer-text"><a href="https://github.com/Abdulaziz-hu/Blockit" target="_blank">Free & Open Source</a></span>
+      <span class="footer-text">Free & Open Source</span>
     </div>
   </div>
 

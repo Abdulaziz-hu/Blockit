@@ -22,8 +22,9 @@
   --red-dim:      rgba(255, 64, 64, 0.08);
   --red-border:   rgba(255, 64, 64, 0.2);
   --green:        #00e676;
-  --link:         #e8ff00;
-  --link-hover:   #a3b012;
+  --orange:       #ff9800;
+  --orange-dim:   rgba(255, 152, 0, 0.08);
+  --orange-border:rgba(255, 152, 0, 0.2);
   --font-mono:    'IBM Plex Mono', monospace;
   --font-sans:    'IBM Plex Sans', sans-serif;
 }
@@ -41,10 +42,11 @@
   --accent-dim:   rgba(122, 136, 0, 0.08);
   --accent-border:rgba(122, 136, 0, 0.25);
   --red:          #cc2222;
-  --link:         #a3b012;
-  --link-hover:   #6f7715;
   --red-dim:      rgba(204, 34, 34, 0.07);
   --red-border:   rgba(204, 34, 34, 0.2);
+  --orange:       #d67700;
+  --orange-dim:   rgba(214, 119, 0, 0.08);
+  --orange-border:rgba(214, 119, 0, 0.25);
 }
 
 html, body { height: 100%; }
@@ -163,15 +165,6 @@ body {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.4; }
-}
-
-a {
-    color: var(--link);
-    text-decoration: underline;
-}
-
-a:hover {
-    color: var(--link-hover);
 }
 
 /* ── ICON ─────────────────────────────────────────────────── */
@@ -316,7 +309,8 @@ a:hover {
 
 .actions {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   justify-content: center;
   animation: fadeUp 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -333,6 +327,7 @@ a:hover {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   transition: all 0.15s ease;
   border: 1px solid transparent;
@@ -357,6 +352,55 @@ a:hover {
 }
 
 .btn-unblock:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Break time buttons */
+.break-time-section {
+  margin-top: 8px;
+}
+
+.break-time-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.break-time-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-break {
+  padding: 7px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.btn-break:hover {
+  background: var(--orange-dim);
+  border-color: var(--orange-border);
+  color: var(--orange);
+}
+
+.btn-break:active { transform: scale(0.96); }
+
+.btn-break:disabled {
   opacity: 0.4;
   cursor: not-allowed;
   pointer-events: none;
@@ -433,7 +477,6 @@ a:hover {
   color: var(--accent);
 }
 
-/* Sun shown in dark mode (click → go light); moon shown in light mode */
 .icon-sun  { display: flex; }
 .icon-moon { display: none; }
 
