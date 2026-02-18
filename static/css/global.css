@@ -1,0 +1,9 @@
+:root {
+    --link:         #f6ff00;
+    --link-hover:   #8f931a;
+}
+
+[data-theme="light"] {
+    --link:         #8f931a;
+    --link-hover:   #d4db23;
+}

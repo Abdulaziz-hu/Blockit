@@ -23,12 +23,12 @@
   --red-border:   rgba(255, 64, 64, 0.2);
   --green:        #00e676;
   --orange:       #ff9800;
-  --link:         #f6ff00;
-  --link-hover:   #8f931a;
   --orange-dim:   rgba(255, 152, 0, 0.08);
   --orange-border:rgba(255, 152, 0, 0.2);
   --font-mono:    'IBM Plex Mono', monospace;
   --font-sans:    'IBM Plex Sans', sans-serif;
+  --link:         #f6ff00;
+  --link-hover:   #8f931a;
 }
 
 [data-theme="light"] {
@@ -47,10 +47,10 @@
   --red-dim:      rgba(204, 34, 34, 0.07);
   --red-border:   rgba(204, 34, 34, 0.2);
   --orange:       #d67700;
-  --link:         #676919;
-  --link-hover:   #bdc312;
   --orange-dim:   rgba(214, 119, 0, 0.08);
   --orange-border:rgba(214, 119, 0, 0.25);
+  --link:         #8f931a;
+  --link-hover:   #d4db23;
 }
 
 html, body { height: 100%; }
@@ -67,8 +67,6 @@ body {
   position: relative;
   transition: background 0.3s ease, color 0.3s ease;
 }
-
-/* ── BACKGROUND DECORATION ────────────────────────────────── */
 
 .bg-grid {
   position: fixed;
@@ -120,8 +118,6 @@ body {
   border-top-left-radius: 2px;
 }
 
-/* ── CONTAINER ────────────────────────────────────────────── */
-
 .container {
   position: relative;
   z-index: 1;
@@ -136,8 +132,6 @@ body {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-/* ── TOP LABEL ────────────────────────────────────────────── */
 
 .top-label {
   display: inline-flex;
@@ -179,8 +173,6 @@ a {
 a:hover {
   color: var(--link-hover);
 }
-
-/* ── ICON ─────────────────────────────────────────────────── */
 
 .block-icon-wrap {
   position: relative;
@@ -235,8 +227,6 @@ a:hover {
   background: linear-gradient(135deg, var(--accent-dim), var(--red-dim));
 }
 
-/* ── TEXT ─────────────────────────────────────────────────── */
-
 .heading {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -277,8 +267,6 @@ a:hover {
   animation: fadeUp 0.5s 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ── STATS BAR ────────────────────────────────────────────── */
-
 .stats-bar {
   display: flex;
   align-items: center;
@@ -317,8 +305,6 @@ a:hover {
   text-transform: uppercase;
   color: var(--text-muted);
 }
-
-/* ── ACTIONS ──────────────────────────────────────────────── */
 
 .actions {
   display: flex;
@@ -370,7 +356,6 @@ a:hover {
   pointer-events: none;
 }
 
-/* Break time buttons */
 .break-time-section {
   margin-top: 8px;
 }
@@ -419,8 +404,6 @@ a:hover {
   pointer-events: none;
 }
 
-/* ── SUCCESS MESSAGE ──────────────────────────────────────── */
-
 .success-msg {
   display: none;
   align-items: center;
@@ -435,8 +418,6 @@ a:hover {
 }
 
 .success-msg.visible { display: flex; }
-
-/* ── FOOTER ───────────────────────────────────────────────── */
 
 .footer {
   margin-top: 44px;
@@ -460,8 +441,6 @@ a:hover {
   height: 10px;
   background: var(--border2);
 }
-
-/* ── THEME BUTTON ─────────────────────────────────────────── */
 
 .theme-btn {
   position: fixed;

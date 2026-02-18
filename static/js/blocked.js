@@ -63,6 +63,44 @@ chrome.runtime.sendMessage(
   }
 );
 
+// ── MOTIVATIONAL QUOTES ───────────────────────────────────────────────────────
+
+// Motivational (and mostly unhinged) quotes
+const quotes = [
+  // Classics
+  'Stay focused. You blocked this site for a reason.',
+  'Deep work beats distraction. Keep going.',
+  'Your future self will thank you.',
+  'Focus is a superpower. You have it.',
+
+  // The Drill Sergeant
+  'DROP AND GIVE ME 20 MINUTES OF PRODUCTIVITY, PRIVATE!',
+  'IS THAT A TAB I SEE? EYES ON THE CODE, SOLDIER!',
+  'YOU THINK THE ENEMY IS WATCHING CAT VIDEOS? GET BACK TO WORK!',
+  'UNLESS THAT WEBSITE IS TITLED "HOW TO BE USEFUL," CLOSE IT!',
+  'I DID NOT RECRUIT YOU TO SCROLL THROUGH REDDIT! MOVE IT!',
+  'YOUR FOCUS IS SO WEAK IT MAKES ME SICK! BACK TO THE TASK!',
+
+  // The Disappointed Parent/Friend
+  'I am not mad, I am just disappointed. Get back to work.',
+  'Is this really what we are doing with our life today?',
+  'Go back to work before I tell your router how ashamed I am.',
+  'Your ancestors did not survive the Stone Age for you to watch this.',
+  'Oh, look who is trying to procrastinate again. How original.',
+
+  // Fun & Self-Aware
+  'Error 404: Willpower not found. (Just kidding, go work.)',
+  'This site is a trap. Dont be a snack.',
+  'If you spend as much time working as you do trying to bypass this, you would be a CEO by now.',
+  'Congratulations! You just saved 15 minutes of your life. Use them wisely.',
+  'The "Add to Blocklist" button was your smartest move today. Keep it that way.',
+  'Nothing to see here but your own untapped potential. Get moving.'
+];
+
+function getRandomQuote() {
+  return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
 // ── PAGE INIT ────────────────────────────────────────────────────────────────
 
 function initPage(domain) {
@@ -71,39 +109,8 @@ function initPage(domain) {
   document.getElementById('siteName').textContent = displayDomain;
   document.title = domain ? `Blocked: ${domain} — BlockIt` : 'Blocked — BlockIt';
 
-// Motivational (and mostly unhinged) quotes
-  const quotes = [
-    // Classics
-    'Stay focused. You blocked this site for a reason.',
-    'Deep work beats distraction. Keep going.',
-    'Your future self will thank you.',
-    'Focus is a superpower. You have it.',
-
-    // The Drill Sergeant
-    'DROP AND GIVE ME 20 MINUTES OF PRODUCTIVITY, PRIVATE!',
-    'IS THAT A TAB I SEE? EYES ON THE CODE, SOLDIER!',
-    'YOU THINK THE ENEMY IS WATCHING CAT VIDEOS? GET BACK TO WORK!',
-    'UNLESS THAT WEBSITE IS TITLED "HOW TO BE USEFUL," CLOSE IT!',
-    'I DID NOT RECRUIT YOU TO SCROLL THROUGH REDDIT! MOVE IT!',
-    'YOUR FOCUS IS SO WEAK IT MAKES ME SICK! BACK TO THE TASK!',
-
-    // The Disappointed Parent/Friend
-    'I’m not mad, I’m just disappointed. Get back to work.',
-    'Is this really what we’re doing with our life today?',
-    'Go back to work before I tell your router how ashamed I am.',
-    'Your ancestors didn’t survive the Stone Age for you to watch this.',
-    'Oh, look who’s trying to procrastinate again. How original.',
-
-    // Fun & Self-Aware
-    'Error 404: Willpower not found. (Just kidding, go work.)',
-    'This site is a trap. Don’t be a snack.',
-    'If you spend as much time working as you do trying to bypass this, you’d be a CEO by now.',
-    'Congratulations! You just saved 15 minutes of your life. Use them wisely.',
-    'The "Add to Blocklist" button was your smartest move today. Keep it that way.',
-    'Nothing to see here but your own untapped potential. Get moving.'
-  ];
-  document.getElementById('motivationalText').textContent =
-    quotes[Math.floor(Math.random() * quotes.length)];
+  // Display random motivational quote
+  document.getElementById('motivationalText').textContent = getRandomQuote();
 
   if (domain) {
     loadStats(domain);
@@ -190,6 +197,7 @@ function setupBreakTime(domain) {
           console.warn('BlockIt: setBreakTime returned failure', response);
           setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
         }
+        // Background handles tab navigation after clearing rules
       });
     });
   });

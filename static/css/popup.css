@@ -25,10 +25,10 @@
   --green-dim: rgba(0, 230, 118, 0.1);
   --blue: #2196f3;
   --blue-dim: rgba(33, 150, 243, 0.1);
-  --link:         #f6ff00;
-  --link-hover:   #8f931a;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'IBM Plex Sans', sans-serif;
+  --link:         #f6ff00;
+  --link-hover:   #8f931a;
 }
 
 /* ── LIGHT THEME ── */
@@ -50,8 +50,8 @@
   --green-dim: rgba(0, 122, 61, 0.08);
   --blue: #1976d2;
   --blue-dim: rgba(25, 118, 210, 0.1);
-  --link:         #f6ff00;
-  --link-hover:   #8f931a;
+  --link:         #8f931a;
+  --link-hover:   #d4db23;
 }
 
 html {
@@ -204,6 +204,32 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* ── SETTINGS BUTTON ── */
+.settings-btn {
+  width: 26px;
+  height: 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.settings-btn:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.settings-btn:active {
+  transform: scale(0.94);
 }
 
 /* ── THEME TOGGLE BUTTON ── */

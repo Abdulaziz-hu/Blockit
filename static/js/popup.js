@@ -14,6 +14,7 @@ const currentDomainEl   = document.getElementById('currentDomain');
 const clearAllBtn       = document.getElementById('clearAllBtn');
 const msgEl             = document.getElementById('msg');
 const themeBtn          = document.getElementById('themeBtn');
+const settingsBtn       = document.getElementById('settingsBtn');
 const searchInput       = document.getElementById('searchInput');
 const searchClear       = document.getElementById('searchClear');
 const updateBanner      = document.getElementById('updateBanner');
@@ -39,6 +40,12 @@ themeBtn.addEventListener('click', () => {
   const next    = current === 'dark' ? 'light' : 'dark';
   applyTheme(next);
   chrome.storage.local.set({ theme: next });
+});
+
+// ── SETTINGS NAVIGATION ────────────────────────────────────────────────────
+
+settingsBtn.addEventListener('click', () => {
+  window.location.href = 'settings.html';
 });
 
 // ── UPDATE CHECKER ─────────────────────────────────────────────────────────
