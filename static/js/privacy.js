@@ -1,7 +1,7 @@
-// BlockIt – Privacy Policy Script
-// MIT License – Open Source
+// BlockIt - Privacy Policy Script
+// MIT License - Open Source
 
-const backBtn = document.getElementById('backBtn');
+const backBtn  = document.getElementById('backBtn');
 const themeBtn = document.getElementById('themeBtn');
 
 // ── THEME ──────────────────────────────────────────────────────────────────

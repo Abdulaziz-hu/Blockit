@@ -3,7 +3,7 @@
 
 const RULE_ID_OFFSET = 1000;
 const GITHUB_API_URL = 'https://api.github.com/repos/Abdulaziz-hu/blockit/releases/latest';
-const CURRENT_VERSION = '1.3.0';
+const CURRENT_VERSION = '1.3.1';
 
 // ── INSTALL / STARTUP ────────────────────────────────────────────────────────
 
@@ -26,11 +26,11 @@ chrome.runtime.onInstalled.addListener(async () => {
 chrome.runtime.onStartup.addListener(async () => {
   await syncRules();
   await cleanExpiredBreakTimes();
-  
+
   const data = await chrome.storage.local.get(['lastUpdateCheck']);
   const lastCheck = data.lastUpdateCheck || 0;
   const oneDayMs = 24 * 60 * 60 * 1000;
-  
+
   if (Date.now() - lastCheck > oneDayMs) {
     checkForUpdates();
   }
@@ -42,16 +42,25 @@ async function checkForUpdates() {
   try {
     const response = await fetch(GITHUB_API_URL);
     if (!response.ok) return;
-    
+
     const release = await response.json();
     const latestVersion = release.tag_name.replace(/^v/, '');
-    
-    await chrome.storage.local.set({ 
+    const updateAvailable = compareVersions(latestVersion, CURRENT_VERSION) > 0;
+
+    await chrome.storage.local.set({
       lastUpdateCheck: Date.now(),
       latestVersion,
-      updateAvailable: compareVersions(latestVersion, CURRENT_VERSION) > 0,
+      updateAvailable,
       releaseUrl: release.html_url
     });
+
+    // If a new update is detected, clear the dismissed flag so the banner shows again
+    if (updateAvailable) {
+      const existing = await chrome.storage.local.get(['dismissedVersion']);
+      if (existing.dismissedVersion !== latestVersion) {
+        await chrome.storage.local.remove('updateDismissed');
+      }
+    }
   } catch (e) {
     console.warn('BlockIt: Update check failed', e);
   }
@@ -60,7 +69,7 @@ async function checkForUpdates() {
 function compareVersions(a, b) {
   const aParts = a.split('.').map(Number);
   const bParts = b.split('.').map(Number);
-  
+
   for (let i = 0; i < 3; i++) {
     const diff = (aParts[i] || 0) - (bParts[i] || 0);
     if (diff !== 0) return diff;
@@ -76,7 +85,7 @@ async function cleanExpiredBreakTimes() {
   const now = Date.now();
   let changed = false;
   const expiredDomains = [];
-  
+
   for (const domain in breakTimes) {
     if (breakTimes[domain] < now) {
       delete breakTimes[domain];
@@ -84,11 +93,11 @@ async function cleanExpiredBreakTimes() {
       changed = true;
     }
   }
-  
+
   if (changed) {
     await chrome.storage.local.set({ breakTimes });
     await syncRules();
-    
+
     // Refresh any tabs showing expired domains
     for (const domain of expiredDomains) {
       const tabs = await chrome.tabs.query({});
@@ -124,9 +133,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     const sites = data.sites || [];
     const globalEnabled = data.globalEnabled !== false;
     const breakTimes = data.breakTimes || {};
-    
+
     if (!globalEnabled) return;
-    
+
     // Check if domain has active break time
     if (breakTimes[domain] && breakTimes[domain] > Date.now()) {
       return; // Allow access during break
@@ -163,11 +172,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'unblockSite':
       handleUnblockSite(message.domain, sender.tab?.id).then(result => sendResponse(result));
       return true;
-      
+
     case 'setBreakTime':
       handleSetBreakTime(message.domain, message.minutes, sender.tab?.id).then(result => sendResponse(result));
       return true;
-      
+
     case 'checkForUpdates':
       checkForUpdates().then(() => {
         chrome.storage.local.get(['updateAvailable', 'latestVersion', 'releaseUrl'], (data) => {
@@ -180,7 +189,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
       });
       return true;
-      
+
     case 'getUpdateInfo':
       chrome.storage.local.get(['updateAvailable', 'latestVersion', 'releaseUrl'], (data) => {
         sendResponse({
@@ -191,7 +200,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         });
       });
       return true;
-      
+
     case 'clearAllData':
       handleClearAllData().then(result => sendResponse(result));
       return true;
@@ -204,7 +213,7 @@ async function handleClearAllData() {
   try {
     await chrome.storage.local.clear();
     await chrome.storage.session.clear();
-    
+
     // Re-initialize with defaults
     await chrome.storage.local.set({
       sites: [],
@@ -214,9 +223,9 @@ async function handleClearAllData() {
       installDate: new Date().toISOString(),
       lastUpdateCheck: Date.now()
     });
-    
+
     await syncRules();
-    
+
     return { success: true };
   } catch (e) {
     return { success: false, error: e.message };
@@ -228,25 +237,25 @@ async function handleSetBreakTime(domain, minutes, tabId) {
     const expiresAt = Date.now() + (minutes * 60 * 1000);
     const data = await chrome.storage.local.get(['breakTimes']);
     const breakTimes = data.breakTimes || {};
-    
+
     breakTimes[domain] = expiresAt;
     await chrome.storage.local.set({ breakTimes });
-    
-    // Clear session marker
+
+    // Clear session marker for this tab
     if (tabId) {
       await chrome.storage.session.remove([`pendingBlock_${tabId}`]);
     }
-    
-    // Sync rules FIRST to remove the block
+
+    // Sync rules to remove the block FIRST, then redirect
     await syncRules();
-    
-    // Then redirect the tab after a short delay
+
+    // Give the declarativeNetRequest rules a moment to propagate, then navigate
     if (tabId) {
       setTimeout(() => {
         chrome.tabs.update(tabId, { url: `https://${domain}` }).catch(() => {});
-      }, 300);
+      }, 500);
     }
-    
+
     return { success: true, domain, expiresAt };
   } catch (e) {
     return { success: false, error: e.message };
@@ -368,7 +377,7 @@ async function syncRules() {
   if (globalEnabled) {
     sites.forEach((site) => {
       if (!site.enabled) return;
-      
+
       // Skip if domain has active break time
       if (breakTimes[site.domain] && breakTimes[site.domain] > now) {
         return;

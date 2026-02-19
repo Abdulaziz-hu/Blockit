@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "BlockIt",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A simple, minimal, open-source site blocker. Block any site instantly — no accounts, no cloud, no cost.",
   "permissions": [
     "declarativeNetRequest",
@@ -43,7 +43,21 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html", "blocked.css", "blocked.js"],
+      "resources": [
+        "blocked.html",
+        "blocked.css",
+        "blocked.js",
+        "popup.html",
+        "popup.css",
+        "popup.js",
+        "settings.html",
+        "settings.css",
+        "settings.js",
+        "privacy.html",
+        "privacy.css",
+        "privacy.js",
+        "global.css"
+      ],
       "matches": ["<all_urls>"]
     }
   ]

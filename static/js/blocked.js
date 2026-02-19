@@ -55,17 +55,12 @@ chrome.runtime.sendMessage(
       domain = urlFallback;
     }
 
-    if (domain) {
-      initPage(domain);
-    } else {
-      initPage(null);
-    }
+    initPage(domain);
   }
 );
 
 // ── MOTIVATIONAL QUOTES ───────────────────────────────────────────────────────
 
-// Motivational (and mostly unhinged) quotes
 const quotes = [
   // Classics
   'Stay focused. You blocked this site for a reason.',
@@ -90,8 +85,8 @@ const quotes = [
 
   // Fun & Self-Aware
   'Error 404: Willpower not found. (Just kidding, go work.)',
-  'This site is a trap. Dont be a snack.',
-  'If you spend as much time working as you do trying to bypass this, you would be a CEO by now.',
+  'This site is a trap. Don\'t be a snack.',
+  'If you spent as much time working as you do trying to bypass this, you\'d be a CEO by now.',
   'Congratulations! You just saved 15 minutes of your life. Use them wisely.',
   'The "Add to Blocklist" button was your smartest move today. Keep it that way.',
   'Nothing to see here but your own untapped potential. Get moving.'
@@ -107,9 +102,8 @@ function initPage(domain) {
   const displayDomain = domain || 'this site';
 
   document.getElementById('siteName').textContent = displayDomain;
-  document.title = domain ? `Blocked: ${domain} — BlockIt` : 'Blocked — BlockIt';
+  document.title = domain ? `Blocked: ${domain} \u2014 BlockIt` : 'Blocked \u2014 BlockIt';
 
-  // Display random motivational quote
   document.getElementById('motivationalText').textContent = getRandomQuote();
 
   if (domain) {
@@ -149,10 +143,11 @@ function loadStats(domain) {
 function setupUnblock(domain) {
   const btn        = document.getElementById('unblockBtn');
   const successMsg = document.getElementById('successMsg');
+  const msgText    = document.getElementById('successMsgText');
 
   btn.addEventListener('click', () => {
     btn.disabled = true;
-    successMsg.textContent = 'Unblocked — redirecting…';
+    msgText.textContent = 'Unblocked \u2014 redirecting\u2026';
     successMsg.classList.add('visible');
 
     chrome.runtime.sendMessage({ action: 'unblockSite', domain }, (response) => {
@@ -163,8 +158,9 @@ function setupUnblock(domain) {
       }
       if (!response || !response.success) {
         console.warn('BlockIt: unblockSite returned failure', response);
-        setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
+        setTimeout(() => { window.location.href = `https://${domain}`; }, 600);
       }
+      // Background handles navigation via chrome.tabs.update
     });
   });
 }
@@ -174,30 +170,37 @@ function setupUnblock(domain) {
 function setupBreakTime(domain) {
   const breakButtons = document.querySelectorAll('.btn-break');
   const successMsg   = document.getElementById('successMsg');
+  const msgText      = document.getElementById('successMsgText');
   const unblockBtn   = document.getElementById('unblockBtn');
-  
+
   breakButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const minutes = parseInt(btn.dataset.minutes, 10);
-      
-      // Disable all buttons
+
+      // Disable all buttons immediately to prevent double-click
       breakButtons.forEach(b => b.disabled = true);
       unblockBtn.disabled = true;
-      
-      successMsg.textContent = `${minutes} min break granted — redirecting…`;
+
+      msgText.textContent = `${minutes} min break granted \u2014 redirecting\u2026`;
       successMsg.classList.add('visible');
-      
+
       chrome.runtime.sendMessage({ action: 'setBreakTime', domain, minutes }, (response) => {
         if (chrome.runtime.lastError) {
           console.warn('BlockIt: setBreakTime error', chrome.runtime.lastError.message);
-          setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
+          // Fallback: navigate manually after a short delay
+          setTimeout(() => { window.location.href = `https://${domain}`; }, 600);
           return;
         }
         if (!response || !response.success) {
           console.warn('BlockIt: setBreakTime returned failure', response);
-          setTimeout(() => { window.location.href = `https://${domain}`; }, 500);
+          setTimeout(() => { window.location.href = `https://${domain}`; }, 600);
+          return;
         }
-        // Background handles tab navigation after clearing rules
+        // Background handles the tab redirect via chrome.tabs.update after syncRules.
+        // As a safety net, also redirect from the page side after a slightly longer delay.
+        setTimeout(() => {
+          window.location.href = `https://${domain}`;
+        }, 800);
       });
     });
   });
