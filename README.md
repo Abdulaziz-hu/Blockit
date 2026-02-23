@@ -3,6 +3,10 @@
 A minimal, open-source Chrome extension to block distracting websites.  
 100% local. No accounts. No cloud. No cost. MIT Licensed.
 
+## Platforms
+
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Web%20Store-blue?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/fhhoocfcbaifholfbfmhpkejmmohondg?utm_source=item-share-cb)
+
 ## Features
 
 - **Block any site**: paste a URL or block the current tab in one click  
