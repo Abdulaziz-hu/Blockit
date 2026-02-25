@@ -4,7 +4,8 @@ A list of all the in progress or complete tasks such as features, fixes, etc.
 
 ## TODO
 
-
+- [ ] in the settings add a toggle button for the shield number on the extension
+- [ ] 
 
 ## DONE
 
