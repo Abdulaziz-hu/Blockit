@@ -9,7 +9,6 @@
 <body>
 
   <div class="top-bar">
-
     <button class="theme-btn" id="themeBtn" title="Toggle theme">
       <span class="icon-sun">
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -30,7 +29,7 @@
   </div>
 
   <div class="last-updated">
-    <strong>Last Updated:</strong> February 18, 2026
+    <strong>Last Updated:</strong> February 25, 2026
   </div>
 
   <div class="intro">
@@ -47,9 +46,10 @@
       <p>All data is stored locally on your device using Chrome's storage API. This includes:</p>
       <ul>
         <li><strong>Blocked Sites List:</strong> Domain names you've chosen to block</li>
-        <li><strong>Extension Settings:</strong> Your preferences (theme, global toggle state)</li>
+        <li><strong>Extension Settings:</strong> Your preferences (theme, global toggle state, sort mode)</li>
         <li><strong>Usage Statistics:</strong> Local counters (number of times blocked, install date)</li>
         <li><strong>Break Times:</strong> Temporary timestamps for break time features</li>
+        <li><strong>Schedules:</strong> Per-site schedule configurations (days &amp; hours)</li>
       </ul>
       <p><strong>None of this data leaves your device.</strong></p>
     </div>
@@ -70,6 +70,7 @@
         <li>&#10003; Never shared with third parties</li>
         <li>&#10003; Not synced across devices</li>
         <li>&#10003; Completely under your control</li>
+        <li>&#10003; Exportable and importable via JSON at any time</li>
       </ul>
     </div>
   </div>
@@ -162,12 +163,14 @@
   </div>
 
   <div class="section">
-    <h2 class="section-title">6. Data Deletion</h2>
+    <h2 class="section-title">6. Data Deletion &amp; Portability</h2>
     <div class="section-content">
       <p>You have complete control over your data:</p>
       <ul>
         <li><strong>Delete individual sites:</strong> Click the &times; button next to any site</li>
         <li><strong>Clear all data:</strong> Settings &rarr; &ldquo;Clear All Data&rdquo; button</li>
+        <li><strong>Export your data:</strong> Settings &rarr; &ldquo;Export Configuration&rdquo; downloads a .json file</li>
+        <li><strong>Import data:</strong> Settings &rarr; &ldquo;Import Configuration&rdquo; merges from a .json file</li>
         <li><strong>Uninstall extension:</strong> Removes all stored data automatically</li>
       </ul>
       <p>Since all data is stored locally, deleting the extension or clearing its data permanently removes everything.</p>
@@ -228,7 +231,8 @@
     <h3>Summary</h3>
     <p>
       <strong>TL;DR:</strong> BlockIt collects zero data. Everything stays on your device.
-      No tracking, no analytics, no servers, no cloud. Open source and transparent.
+      No tracking, no analytics, no servers, no cloud. Your data is exportable and fully under your control.
+      Open source and transparent.
     </p>
   </div>
 

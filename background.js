@@ -1,31 +1,35 @@
 // BlockIt - Background Service Worker
 // MIT License - Open Source
+// v1.4.0
 
 const RULE_ID_OFFSET = 1000;
 const GITHUB_API_URL = 'https://api.github.com/repos/Abdulaziz-hu/blockit/releases/latest';
-const CURRENT_VERSION = '1.3.1';
+const CURRENT_VERSION = '1.4.1';
 
 // ── INSTALL / STARTUP ────────────────────────────────────────────────────────
 
 chrome.runtime.onInstalled.addListener(async () => {
   const data = await chrome.storage.local.get([
-    'sites', 'globalEnabled', 'blockHits', 'installDate', 'breakTimes', 'lastUpdateCheck'
+    'sites', 'globalEnabled', 'blockHits', 'installDate', 'breakTimes', 'lastUpdateCheck', 'schedules'
   ]);
 
   if (!data.sites)                      await chrome.storage.local.set({ sites: [] });
   if (!data.blockHits)                  await chrome.storage.local.set({ blockHits: {} });
   if (!data.breakTimes)                 await chrome.storage.local.set({ breakTimes: {} });
+  if (!data.schedules)                  await chrome.storage.local.set({ schedules: {} });
   if (data.globalEnabled === undefined) await chrome.storage.local.set({ globalEnabled: true });
   if (!data.installDate)                await chrome.storage.local.set({ installDate: new Date().toISOString() });
   if (!data.lastUpdateCheck)            await chrome.storage.local.set({ lastUpdateCheck: Date.now() });
 
   await syncRules();
+  await updateBadge();
   checkForUpdates();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   await syncRules();
   await cleanExpiredBreakTimes();
+  await updateBadge();
 
   const data = await chrome.storage.local.get(['lastUpdateCheck']);
   const lastCheck = data.lastUpdateCheck || 0;
@@ -35,6 +39,24 @@ chrome.runtime.onStartup.addListener(async () => {
     checkForUpdates();
   }
 });
+
+// ── BADGE ────────────────────────────────────────────────────────────────────
+
+async function updateBadge() {
+  try {
+    const data = await chrome.storage.local.get(['sites', 'globalEnabled']);
+    const sites = data.sites || [];
+    const globalEnabled = data.globalEnabled !== false;
+    const activeCount = globalEnabled ? sites.filter(s => s.enabled).length : 0;
+
+    if (activeCount > 0) {
+      await chrome.action.setBadgeText({ text: String(activeCount) });
+      await chrome.action.setBadgeBackgroundColor({ color: '#e8ff00' });
+    } else {
+      await chrome.action.setBadgeText({ text: '' });
+    }
+  } catch (_) {}
+}
 
 // ── UPDATE CHECKER ───────────────────────────────────────────────────────────
 
@@ -54,7 +76,6 @@ async function checkForUpdates() {
       releaseUrl: release.html_url
     });
 
-    // If a new update is detected, clear the dismissed flag so the banner shows again
     if (updateAvailable) {
       const existing = await chrome.storage.local.get(['dismissedVersion']);
       if (existing.dismissedVersion !== latestVersion) {
@@ -69,12 +90,39 @@ async function checkForUpdates() {
 function compareVersions(a, b) {
   const aParts = a.split('.').map(Number);
   const bParts = b.split('.').map(Number);
-
   for (let i = 0; i < 3; i++) {
     const diff = (aParts[i] || 0) - (bParts[i] || 0);
     if (diff !== 0) return diff;
   }
   return 0;
+}
+
+// ── SCHEDULE HELPERS ─────────────────────────────────────────────────────────
+
+/**
+ * Check if a site's schedule is currently active (blocking should apply).
+ * A schedule looks like: { enabled: true, days: [0,1,2,3,4], startTime: "09:00", endTime: "17:00" }
+ * Days: 0=Sun, 1=Mon, ... 6=Sat
+ */
+function isScheduleActive(schedule) {
+  if (!schedule || !schedule.enabled) return true; // No schedule = always block
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  if (!schedule.days || !schedule.days.includes(dayOfWeek)) return false;
+
+  const [startH, startM] = (schedule.startTime || '00:00').split(':').map(Number);
+  const [endH, endM] = (schedule.endTime || '23:59').split(':').map(Number);
+  const startMinutes = startH * 60 + startM;
+  const endMinutes = endH * 60 + endM;
+
+  if (startMinutes <= endMinutes) {
+    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+  } else {
+    // Overnight schedule (e.g. 22:00 - 06:00)
+    return currentMinutes >= startMinutes || currentMinutes < endMinutes;
+  }
 }
 
 // ── BREAK TIME MANAGEMENT ────────────────────────────────────────────────────
@@ -98,7 +146,6 @@ async function cleanExpiredBreakTimes() {
     await chrome.storage.local.set({ breakTimes });
     await syncRules();
 
-    // Refresh any tabs showing expired domains
     for (const domain of expiredDomains) {
       const tabs = await chrome.tabs.query({});
       for (const tab of tabs) {
@@ -116,8 +163,12 @@ async function cleanExpiredBreakTimes() {
   }
 }
 
-// Run cleanup every 30 seconds
-setInterval(cleanExpiredBreakTimes, 30000);
+// Run cleanup every 30 seconds & re-check schedules
+setInterval(async () => {
+  await cleanExpiredBreakTimes();
+  await syncRules(); // Re-sync to apply schedule changes
+  await updateBadge();
+}, 30000);
 
 // ── TAB NAVIGATION TRACKING ──────────────────────────────────────────────────
 
@@ -129,24 +180,41 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
     const domain = url.hostname.replace(/^www\./, '');
 
-    const data = await chrome.storage.local.get(['sites', 'globalEnabled', 'breakTimes']);
+    const data = await chrome.storage.local.get(['sites', 'globalEnabled', 'breakTimes', 'schedules']);
     const sites = data.sites || [];
     const globalEnabled = data.globalEnabled !== false;
     const breakTimes = data.breakTimes || {};
+    const schedules = data.schedules || {};
 
     if (!globalEnabled) return;
 
-    // Check if domain has active break time
     if (breakTimes[domain] && breakTimes[domain] > Date.now()) {
-      return; // Allow access during break
+      return;
     }
 
-    const blocked = sites.find(s => s.enabled && s.domain === domain);
+    const blocked = sites.find(s => s.enabled && domainMatches(s.domain, domain));
     if (!blocked) return;
 
-    await chrome.storage.session.set({ [`pendingBlock_${details.tabId}`]: domain });
+    // Check schedule for this site
+    const schedule = schedules[blocked.domain];
+    if (!isScheduleActive(schedule)) return;
+
+    await chrome.storage.session.set({ [`pendingBlock_${details.tabId}`]: blocked.domain });
   } catch (_) {}
 }, { url: [{ schemes: ['http', 'https'] }] });
+
+/**
+ * Match a pattern (supports wildcard *) against a real domain.
+ * e.g. "*.reddit.com" matches "old.reddit.com"
+ */
+function domainMatches(pattern, domain) {
+  if (pattern === domain) return true;
+  if (pattern.startsWith('*.')) {
+    const base = pattern.slice(2);
+    return domain === base || domain.endsWith('.' + base);
+  }
+  return false;
+}
 
 // ── MESSAGE HANDLER ──────────────────────────────────────────────────────────
 
@@ -154,7 +222,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.action) {
 
     case 'syncRules':
-      syncRules().then(() => sendResponse({ success: true }));
+      syncRules()
+        .then(() => updateBadge())
+        .then(() => sendResponse({ success: true }));
       return true;
 
     case 'blockCurrentTab':
@@ -204,6 +274,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     case 'clearAllData':
       handleClearAllData().then(result => sendResponse(result));
       return true;
+
+    case 'exportData':
+      handleExportData().then(result => sendResponse(result));
+      return true;
+
+    case 'importData':
+      handleImportData(message.data).then(result => sendResponse(result));
+      return true;
+
+    case 'setSchedule':
+      handleSetSchedule(message.domain, message.schedule).then(result => sendResponse(result));
+      return true;
+
+    case 'getSchedules':
+      chrome.storage.local.get(['schedules'], (data) => {
+        sendResponse({ success: true, schedules: data.schedules || {} });
+      });
+      return true;
   }
 });
 
@@ -214,16 +302,100 @@ async function handleClearAllData() {
     await chrome.storage.local.clear();
     await chrome.storage.session.clear();
 
-    // Re-initialize with defaults
     await chrome.storage.local.set({
       sites: [],
       globalEnabled: true,
       blockHits: {},
       breakTimes: {},
+      schedules: {},
       installDate: new Date().toISOString(),
       lastUpdateCheck: Date.now()
     });
 
+    await syncRules();
+    await updateBadge();
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+async function handleExportData() {
+  try {
+    const data = await chrome.storage.local.get([
+      'sites', 'globalEnabled', 'blockHits', 'installDate', 'schedules'
+    ]);
+
+    const exportObj = {
+      version: CURRENT_VERSION,
+      exportedAt: new Date().toISOString(),
+      sites: data.sites || [],
+      globalEnabled: data.globalEnabled !== false,
+      blockHits: data.blockHits || {},
+      schedules: data.schedules || {},
+      installDate: data.installDate || new Date().toISOString()
+    };
+
+    return { success: true, data: exportObj };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+async function handleImportData(importObj) {
+  try {
+    if (!importObj || !Array.isArray(importObj.sites)) {
+      return { success: false, error: 'Invalid import file format.' };
+    }
+
+    // Merge or replace — we merge by domain to avoid duplicates
+    const existing = await chrome.storage.local.get(['sites', 'blockHits', 'schedules']);
+    const existingSites = existing.sites || [];
+    const existingHits = existing.blockHits || {};
+    const existingSchedules = existing.schedules || {};
+
+    const mergedSitesMap = {};
+    for (const s of existingSites) mergedSitesMap[s.domain] = s;
+    for (const s of importObj.sites) {
+      if (s.domain) mergedSitesMap[s.domain] = {
+        id: s.id || Date.now() + Math.random(),
+        domain: s.domain,
+        enabled: s.enabled !== false,
+        addedAt: s.addedAt || new Date().toISOString()
+      };
+    }
+
+    const mergedHits = { ...existingHits, ...(importObj.blockHits || {}) };
+    const mergedSchedules = { ...existingSchedules, ...(importObj.schedules || {}) };
+
+    await chrome.storage.local.set({
+      sites: Object.values(mergedSitesMap),
+      blockHits: mergedHits,
+      schedules: mergedSchedules
+    });
+
+    await syncRules();
+    await updateBadge();
+
+    return { success: true, count: Object.values(mergedSitesMap).length };
+  } catch (e) {
+    return { success: false, error: e.message };
+  }
+}
+
+async function handleSetSchedule(domain, schedule) {
+  try {
+    const data = await chrome.storage.local.get(['schedules']);
+    const schedules = data.schedules || {};
+
+    if (schedule === null) {
+      delete schedules[domain];
+    } else {
+      schedules[domain] = schedule;
+    }
+
+    await chrome.storage.local.set({ schedules });
     await syncRules();
 
     return { success: true };
@@ -241,15 +413,12 @@ async function handleSetBreakTime(domain, minutes, tabId) {
     breakTimes[domain] = expiresAt;
     await chrome.storage.local.set({ breakTimes });
 
-    // Clear session marker for this tab
     if (tabId) {
       await chrome.storage.session.remove([`pendingBlock_${tabId}`]);
     }
 
-    // Sync rules to remove the block FIRST, then redirect
     await syncRules();
 
-    // Give the declarativeNetRequest rules a moment to propagate, then navigate
     if (tabId) {
       setTimeout(() => {
         chrome.tabs.update(tabId, { url: `https://${domain}` }).catch(() => {});
@@ -313,6 +482,7 @@ async function handleUnblockSite(domain, tabId) {
     if (tabId) await chrome.storage.session.remove([`pendingBlock_${tabId}`]);
 
     await syncRules();
+    await updateBadge();
 
     if (tabId) {
       setTimeout(() => {
@@ -354,6 +524,7 @@ async function handleBlockCurrentTab(tabId) {
     sites.push(newSite);
     await chrome.storage.local.set({ sites });
     await syncRules();
+    await updateBadge();
 
     return { success: true, domain: hostname, site: newSite };
   } catch (e) {
@@ -364,10 +535,11 @@ async function handleBlockCurrentTab(tabId) {
 // ── SYNC RULES ────────────────────────────────────────────────────────────────
 
 async function syncRules() {
-  const data = await chrome.storage.local.get(['sites', 'globalEnabled', 'breakTimes']);
+  const data = await chrome.storage.local.get(['sites', 'globalEnabled', 'breakTimes', 'schedules']);
   const sites = data.sites || [];
   const globalEnabled = data.globalEnabled !== false;
   const breakTimes = data.breakTimes || {};
+  const schedules = data.schedules || {};
   const now = Date.now();
 
   const existingRules = await chrome.declarativeNetRequest.getDynamicRules();
@@ -375,17 +547,43 @@ async function syncRules() {
   const addRules = [];
 
   if (globalEnabled) {
-    sites.forEach((site) => {
-      if (!site.enabled) return;
+    for (const site of sites) {
+      if (!site.enabled) continue;
 
       // Skip if domain has active break time
-      if (breakTimes[site.domain] && breakTimes[site.domain] > now) {
-        return;
-      }
+      if (breakTimes[site.domain] && breakTimes[site.domain] > now) continue;
+
+      // Skip if schedule says we shouldn't block right now
+      const schedule = schedules[site.domain];
+      if (!isScheduleActive(schedule)) continue;
 
       const domain = site.domain.replace(/^www\./, '');
-      const ruleId = RULE_ID_OFFSET + (site.id % 900000);
-      const requestDomains = [domain];
+      const ruleId = RULE_ID_OFFSET + (Math.abs(hashCode(domain)) % 900000);
+
+      // Handle wildcard domains like *.reddit.com
+      let requestDomains;
+      if (domain.startsWith('*.')) {
+        // We can't use wildcards in declarativeNetRequest requestDomains directly
+        // so we use urlFilter instead
+        const base = domain.slice(2);
+        addRules.push({
+          id: ruleId,
+          priority: 1,
+          action: {
+            type: 'redirect',
+            redirect: {
+              extensionPath: '/blocked.html?site=' + encodeURIComponent(base)
+            }
+          },
+          condition: {
+            urlFilter: `||${base}^`,
+            resourceTypes: ['main_frame']
+          }
+        });
+        continue;
+      }
+
+      requestDomains = [domain];
       if (!domain.startsWith('www.')) requestDomains.push(`www.${domain}`);
 
       addRules.push({
@@ -402,8 +600,17 @@ async function syncRules() {
           resourceTypes: ['main_frame']
         }
       });
-    });
+    }
   }
 
   await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: removeIds, addRules });
+}
+
+function hashCode(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash;
 }

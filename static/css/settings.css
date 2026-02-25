@@ -22,10 +22,11 @@
   --red-dim: rgba(255, 64, 64, 0.1);
   --green: #00e676;
   --blue: #2196f3;
+  --orange: #ff9800;
   --font-mono: 'IBM Plex Mono', monospace;
   --font-sans: 'IBM Plex Sans', sans-serif;
-  --link:         #f6ff00;
-  --link-hover:   #8f931a;
+  --link: #f6ff00;
+  --link-hover: #8f931a;
 }
 
 [data-theme="light"] {
@@ -44,8 +45,9 @@
   --red-dim: rgba(204, 34, 34, 0.08);
   --green: #007a3d;
   --blue: #1976d2;
-  --link:         #8f931a;
-  --link-hover:   #d4db23;
+  --orange: #d67700;
+  --link: #8f931a;
+  --link-hover: #d4db23;
 }
 
 html {
@@ -154,9 +156,7 @@ body {
   margin-bottom: 24px;
 }
 
-.section:last-child {
-  margin-bottom: 0;
-}
+.section:last-child { margin-bottom: 0; }
 
 .section-title {
   font-family: var(--font-mono);
@@ -176,9 +176,7 @@ body {
   margin-bottom: 8px;
 }
 
-.setting-item:last-child {
-  margin-bottom: 0;
-}
+.setting-item:last-child { margin-bottom: 0; }
 
 .setting-info {
   display: flex;
@@ -225,13 +223,9 @@ body {
   color: var(--accent);
 }
 
-.setting-btn:active {
-  transform: scale(0.98);
-}
+.setting-btn:active { transform: scale(0.98); }
 
-.setting-btn.danger {
-  color: var(--red);
-}
+.setting-btn.danger { color: var(--red); }
 
 .setting-btn.danger:hover {
   border-color: rgba(255, 64, 64, 0.3);
@@ -244,6 +238,7 @@ body {
   pointer-events: none;
 }
 
+/* ── UPDATE STATUS ── */
 .update-status {
   margin-top: 8px;
   padding: 10px 12px;
@@ -255,9 +250,7 @@ body {
   animation: fadeIn 0.2s ease;
 }
 
-.update-status.hidden {
-  display: none;
-}
+.update-status.hidden { display: none; }
 
 .update-status.success {
   background: rgba(0, 230, 118, 0.1);
@@ -283,13 +276,38 @@ body {
   cursor: pointer;
 }
 
-.update-link:hover {
-  opacity: 0.8;
-}
+.update-link:hover { opacity: 0.8; }
 
-.warning-text {
+/* ── IO STATUS (Import/Export) ── */
+.io-status {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 10px;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  animation: fadeIn 0.2s ease;
+}
+
+.io-status.hidden { display: none; }
+
+.io-status.success {
+  background: rgba(0, 230, 118, 0.1);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  color: var(--green);
+}
+
+.io-status.error {
+  background: var(--red-dim);
+  border: 1px solid rgba(255, 64, 64, 0.2);
+  color: var(--red);
+}
+
+/* ── MISC ── */
+.warning-text {
+  font-family: var(--font-sans);
+  font-size: 11px;
   line-height: 1.6;
   color: var(--text-muted);
   padding: 10px 12px;
@@ -332,9 +350,7 @@ body {
   transition: opacity 0.15s ease;
 }
 
-.about-links a:hover {
-  opacity: 0.7;
-}
+.about-links a:hover { opacity: 0.7; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-4px); }

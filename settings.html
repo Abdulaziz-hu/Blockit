@@ -40,7 +40,7 @@
         <div class="setting-item">
           <div class="setting-info">
             <div class="setting-label">Current Version</div>
-            <div class="setting-desc" id="currentVersion">v1.3.1</div>
+            <div class="setting-desc" id="currentVersion">v1.4.1</div>
           </div>
         </div>
 
@@ -52,6 +52,34 @@
         </div>
 
         <div class="update-status hidden" id="updateStatus"></div>
+      </div>
+
+      <!-- Import / Export Section -->
+      <div class="section">
+        <div class="section-title">Import &amp; Export</div>
+
+        <div class="setting-item">
+          <button class="setting-btn" id="exportBtn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Export Configuration
+          </button>
+        </div>
+
+        <div class="setting-item">
+          <!-- Label wraps the file input — the user's real click opens the OS file picker.
+               Programmatic .click() on file inputs is blocked in extension pages. -->
+          <label class="setting-btn" id="importBtn" style="cursor:pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Import Configuration
+            <input type="file" id="importFileInput" accept=".json" style="display:none;" />
+          </label>
+        </div>
+
+        <div class="io-status hidden" id="ioStatus"></div>
+
+        <div class="warning-text">
+          Import merges with existing data (no duplicates). Export saves all blocked sites, schedules &amp; statistics.
+        </div>
       </div>
 
       <!-- Support Section -->
@@ -78,7 +106,7 @@
         </div>
 
         <div class="warning-text">
-          &#9888;&#65039; This will delete all blocked sites, statistics, and settings. This action cannot be undone.
+          &#9888;&#65039; This will delete all blocked sites, statistics, schedules, and settings. This action cannot be undone.
         </div>
       </div>
 
